@@ -97,15 +97,15 @@ elif page == "Feature Engineering":
     show_feature_engineering()
 
 # model training page
-elif page == "Model Training":
-    st.header("🧠 Model Training")
-    st.markdown("This page can show model training results.")
-    show_model_training()
+elif page == "Model Training and Prediction":
+     from modules.train_and_predict import show_train_and_predict
+     show_train_and_predict()
 # Simple Prediction Page
-elif page == "Prediction":
-    st.header("📊 Climate Prediction (Mockup)")
-    st.markdown("This page can show simple regression model results.")
-    show_prediction()
+#elif page == "Prediction":
+   # st.header("📊 Climate Prediction (Mockup)")
+   # st.markdown("This page can show simple regression model results.")
+   # show_prediction()
+
 elif page == "NLP Sentiment Analysis":
     st.header("📝 NLP Sentiment Analysis")
     from modules.NLP_sentiment_view import show_sentiment_analysis
