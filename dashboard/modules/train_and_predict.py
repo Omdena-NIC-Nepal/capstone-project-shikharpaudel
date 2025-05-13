@@ -24,15 +24,16 @@ def show_train_and_predict():
     df.replace([np.inf, -np.inf], np.nan, inplace=True)
     df.dropna(inplace=True)
 
-    # Encode province
-    if df['province'].dtype == 'object':
+    # Encode 'province' and save label encoder in session state
+    if "label_encoder" not in st.session_state:
         label_encoder = LabelEncoder()
         df['province'] = label_encoder.fit_transform(df['province'])
         st.session_state.label_encoder = label_encoder
     else:
-        label_encoder = st.session_state.get("label_encoder", None)
+        label_encoder = st.session_state.label_encoder
+        df['province'] = label_encoder.transform(df['province'])
 
-    # Features & targets
+    # Features and Targets
     features = ['year', 'month', 'province']
     targets = [
         'precipitation_total', 'relative_humidity_2m', 'air_temp_2m',
@@ -45,7 +46,7 @@ def show_train_and_predict():
     if st.button("Train Models"):
         st.write("Training models...")
         st.session_state.trained_models = {}
-        st.session_state.models_trained = False  # Reset flag
+        st.session_state.models_trained = False
 
         for target in targets:
             if target not in df.columns:
@@ -67,23 +68,23 @@ def show_train_and_predict():
             rmse = np.sqrt(mse)
             r2 = r2_score(y_test, y_pred)
 
-            st.success(f"Trained model for {target}")
+            st.success(f"✅ Trained model for `{target}`")
             st.markdown(f"- **MSE**: {mse:.2f}")
             st.markdown(f"- **RMSE**: {rmse:.2f}")
             st.markdown(f"- **R² Score**: {r2:.2f}")
 
         st.session_state.models_trained = True
-        st.success("✅ All models trained and stored in memory.")
+        st.success("🎉 All models trained and stored in memory.")
 
     # --- Prediction Section ---
     st.markdown("---")
     st.subheader("📈 Make Predictions")
 
     if not st.session_state.get("models_trained", False):
-        st.info("Please train the models above before making predictions.")
+        st.info("⚠️ Please train the models above before making predictions.")
         return
 
-    # User input for prediction
+    # Prediction input
     year = st.number_input("Select Year", min_value=1980, max_value=2030, value=2023)
     month = st.selectbox("Select Month", list(range(1, 13)))
     province_name = st.selectbox("Select Province", st.session_state.label_encoder.classes_)
@@ -109,7 +110,7 @@ def show_train_and_predict():
             st.warning(f"Prediction failed for {target}: {e}")
 
     if predictions:
-        st.subheader("Predicted Climate Features")
+        st.subheader("🔮 Predicted Climate Features")
         st.table(pd.DataFrame([predictions]))
     else:
         st.warning("❌ No predictions available.")
