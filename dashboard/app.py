@@ -98,11 +98,9 @@ elif page == "Feature Engineering":
 
 # model training page
 elif page == "Model Training":
-    show_model_training()
-elif page == "Model Training":
     st.header("🧠 Model Training")
     st.markdown("This page can show model training results.")
-    st.write("Coming Soon...")
+    show_model_training()
 # Simple Prediction Page
 elif page == "Prediction":
     st.header("📊 Climate Prediction (Mockup)")
