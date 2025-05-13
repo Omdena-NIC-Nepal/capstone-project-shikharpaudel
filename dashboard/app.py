@@ -20,7 +20,7 @@ def load_data():
     return climate, glacier
 climate_df, glacier_df = load_data()
 # sidebar Navigation
-page = st.sidebar.radio("select a Page", ["Home","Climate Trends","Glacier Overview","EDA","Feature Engineering","Model Training","Prediction", "NLP Sentiment Analysis"])
+page = st.sidebar.radio("select a Page", ["Home","Climate Trends","Glacier Overview","EDA","Feature Engineering","Model Training and Prediction", "NLP Sentiment Analysis"])
 # Home Page
 if page == "Home":
     show_home()
