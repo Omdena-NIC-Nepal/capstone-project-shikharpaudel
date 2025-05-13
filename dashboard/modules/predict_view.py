@@ -1,31 +1,37 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
+import os
+import joblib
 
 def show_prediction():
     st.title("Climate Feature Prediction")
 
-    # Define the input features
+    # User inputs
     year = st.number_input("Select Year", min_value=1980, max_value=2030, value=2023)
     month = st.selectbox("Select Month", list(range(1, 13)))
-    province_names = ["1", "2", "3", "4", "5", "6", "7"]  # Change if province names differ
+    province_names = ["1", "2", "3", "4", "5", "6", "7"]  # Update if needed
     province_input = st.selectbox("Select Province", province_names)
 
-    # Check if encoder and models are in session_state
-    if "province_label_encoder" not in st.session_state:
-        st.error("Province label encoder not found in memory. Please train the models first.")
+    targets = [
+        'precipitation_total', 'relative_humidity_2m', 'air_temp_2m',
+        'max_temp_2m', 'min_temp_2m', 'wind_speed_10m',
+        'max_wind_speed_10m', 'min_wind_speed_10m'
+    ]
+
+    # ✅ Load label encoder from disk only when needed
+    encoder_path = "models/province_label_encoder.pkl"
+    if os.path.exists(encoder_path):
+        label_encoder = joblib.load(encoder_path)
+    else:
+        st.error("Province label encoder not found. Please train the models first.")
         return
 
-    if "trained_models" not in st.session_state:
-        st.error("Trained models not found in memory. Please train the models first.")
-        return
-
-    #  Get encoder from memory
-    label_encoder = st.session_state.province_label_encoder
-
+    # ✅ Encode province
     try:
         province_encoded = label_encoder.transform([province_input])[0]
     except Exception as e:
-        st.error(f"Province encoding error: {e}")
+        st.error(f"Province encoding error: {str(e)}")
         return
 
     input_data = pd.DataFrame({
@@ -34,21 +40,18 @@ def show_prediction():
         'province': [province_encoded]
     })
 
-    # Target climate features
-    targets = [
-        'precipitation_total', 'relative_humidity_2m', 'air_temp_2m',
-        'max_temp_2m', 'min_temp_2m', 'wind_speed_10m',
-        'max_wind_speed_10m', 'min_wind_speed_10m'
-    ]
-
-    #  Predict using cached models
     predictions = {}
+
+    # ✅ Load model from disk only when needed
     for target in targets:
-        if target not in st.session_state.trained_models:
-            st.warning(f"Model for '{target}' not found in session.")
+        model_path = f"models/{target}_model.pkl"
+        if os.path.exists(model_path):
+            model = joblib.load(model_path)
+        else:
+            st.warning(f"Model for {target} not found.")
             continue
 
-        model = st.session_state.trained_models[target]
+        # Make predictions
         pred = model.predict(input_data)[0]
         predictions[target] = round(pred, 2)
 
@@ -56,4 +59,4 @@ def show_prediction():
         st.subheader("Predicted Climate Features")
         st.table(pd.DataFrame([predictions]))
     else:
-        st.warning("No predictions could be made. Please ensure models are trained.")
+        st.warning("No predictions could be made. Please check the models.")
