@@ -8,8 +8,8 @@ def show_feature_engineering():
 
     # Load engineered data
     try:
-        climate_df = pd.read_csv("../data/featured/feature_climate.csv")
-        glacier_df = pd.read_csv("../data/featured/feature_glacier.csv")
+        climate_df = pd.read_csv("data/featured/feature_climate.csv")
+        glacier_df = pd.read_csv("data/featured/feature_glacier.csv")
     except FileNotFoundError:
         st.error("Engineered feature files not found. Please run feature engineering first.")
         return

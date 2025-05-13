@@ -12,7 +12,7 @@ def show_model_training():
     st.title("Model Training - Climate Prediction")
 
     # Load featured climate dataset
-    data_path = "../data/featured/feature_climate.csv"
+    data_path = "data/featured/feature_climate.csv"
     if not os.path.exists(data_path):
         st.error("Climate feature file not found.")
         return

@@ -15,8 +15,8 @@ st.set_page_config(page_title = "Climate Impact in Nepal", layout = "wide")
 #load data
 @st.cache_data
 def load_data():
-    climate = pd.read_csv("../data/raw/climate_data_nepal_district_wise_monthly_province_grouped.csv")
-    glacier = pd.read_csv("../data/raw/nepal_glacier_data.csv")
+    climate = pd.read_csv("data/raw/climate_data_nepal_district_wise_monthly_province_grouped.csv")
+    glacier = pd.read_csv("data/raw/nepal_glacier_data.csv")
     return climate, glacier
 climate_df, glacier_df = load_data()
 # sidebar Navigation
