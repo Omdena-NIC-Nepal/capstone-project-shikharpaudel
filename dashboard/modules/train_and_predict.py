@@ -45,6 +45,7 @@ def show_train_and_predict():
     if st.button("Train Models"):
         st.write("Training models...")
         st.session_state.trained_models = {}
+        st.session_state.models_trained = False  # Reset flag
 
         for target in targets:
             if target not in df.columns:
@@ -71,13 +72,14 @@ def show_train_and_predict():
             st.markdown(f"- **RMSE**: {rmse:.2f}")
             st.markdown(f"- **R² Score**: {r2:.2f}")
 
+        st.session_state.models_trained = True
         st.success("✅ All models trained and stored in memory.")
 
     # --- Prediction Section ---
     st.markdown("---")
     st.subheader("📈 Make Predictions")
 
-    if "trained_models" not in st.session_state or "label_encoder" not in st.session_state:
+    if not st.session_state.get("models_trained", False):
         st.info("Please train the models above before making predictions.")
         return
 
