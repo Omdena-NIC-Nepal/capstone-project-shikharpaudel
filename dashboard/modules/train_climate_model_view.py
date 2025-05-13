@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestRegressor
@@ -26,15 +27,15 @@ def show_model_training():
     df.replace([np.inf, -np.inf], np.nan, inplace=True)
     df.dropna(inplace=True)
 
-    # Encode and store LabelEncoder in memory
+    # Encode 'province'
     if df['province'].dtype == 'object':
         label_encoder = LabelEncoder()
         df['province'] = label_encoder.fit_transform(df['province'])
-        st.session_state.province_label_encoder = label_encoder  # ✅ Store in session_state
+        os.makedirs("models", exist_ok=True)
+        joblib.dump(label_encoder, "models/province_label_encoder.pkl")
     else:
         label_encoder = None
 
-    # Feature and target columns
     features = ['year', 'month', 'province']
     targets = [
         'precipitation_total', 'relative_humidity_2m', 'air_temp_2m',
@@ -46,11 +47,6 @@ def show_model_training():
 
     if st.button("Train Models"):
         st.write("Training models...")
-
-        # Initialize trained_models dictionary in session_state
-        if "trained_models" not in st.session_state:
-            st.session_state.trained_models = {}
-
         for target in targets:
             if target not in df.columns:
                 st.warning(f"{target} not found in data.")
@@ -70,8 +66,8 @@ def show_model_training():
             rmse = np.sqrt(mse)
             r2 = r2_score(y_test, y_pred)
 
-           #Store trained model in memory
-            st.session_state.trained_models[target] = model
+            # Save model
+            joblib.dump(model, f"models/{target}_model.pkl")
 
             st.success(f"Trained model for {target}")
             st.markdown(f"- **MSE**: {mse:.2f}")
